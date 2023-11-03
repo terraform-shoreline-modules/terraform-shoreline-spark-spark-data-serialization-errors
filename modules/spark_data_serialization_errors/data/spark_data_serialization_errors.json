@@ -1,29 +1,29 @@
 {
   "name": "spark_data_serialization_errors",
-  "description": "This incident type occurs when data serialization errors are encountered while processing certain types of data in Spark. Serialization errors can occur when trying to convert complex data structures or objects into a format that can be easily stored or transmitted. These errors can cause failures in Spark jobs or tasks, leading to delays, errors, or other issues in the software system. It is important to identify and address these errors promptly to ensure the smooth functioning of the system.",
+  "description": "Data Serialization Errors in Spark Processing refer to issues that arise when Spark, a distributed computing system, encounters problems in handling certain types of data. Serialization is the process of converting complex data structures into a format that can be easily transmitted or stored. When data is deserialized, it is reconstructed back into its original form. However, if there are issues with serialization, it can cause errors and affect the processing of data in Spark. These errors can cause delays or failures in data processing, which can impact the overall performance of the system.",
   "params": [
     {
-      "name": "PATH_TO_SPARK_JOB_CONFIGURATION",
+      "name": "DATA_TYPE",
       "value": ""
     },
     {
-      "name": "VERSION",
+      "name": "PATH_TO_SPARK_CODE",
       "value": ""
     },
     {
-      "name": "PATH_TO_DATA_FILE",
-      "value": ""
-    },
-    {
-      "name": "LIBRARY",
-      "value": ""
-    },
-    {
-      "name": "DATA_THAT_CAUSED_SERIALIZATION_ERROR",
+      "name": "SERIALIZATION_FORMAT",
       "value": ""
     },
     {
       "name": "PATH_TO_SPARK_LOGS",
+      "value": ""
+    },
+    {
+      "name": "SPARK_CONF_FILE_PATH",
+      "value": ""
+    },
+    {
+      "name": "DATA_FILE_PATH",
       "value": ""
     },
     {
@@ -44,91 +44,127 @@
       "name": "cell_1",
       "type": "MARKDOWN",
       "enabled": true,
-      "content": "## Spark data serialization errors.\nThis incident type occurs when data serialization errors are encountered while processing certain types of data in Spark. Serialization errors can occur when trying to convert complex data structures or objects into a format that can be easily stored or transmitted. These errors can cause failures in Spark jobs or tasks, leading to delays, errors, or other issues in the software system. It is important to identify and address these errors promptly to ensure the smooth functioning of the system."
+      "content": "## Spark Data Serialization Errors\nData Serialization Errors in Spark Processing refer to issues that arise when Spark, a distributed computing system, encounters problems in handling certain types of data. Serialization is the process of converting complex data structures into a format that can be easily transmitted or stored. When data is deserialized, it is reconstructed back into its original form. However, if there are issues with serialization, it can cause errors and affect the processing of data in Spark. These errors can cause delays or failures in data processing, which can impact the overall performance of the system."
     },
     {
       "name": "cell_2",
       "type": "MARKDOWN",
       "enabled": true,
-      "content": "## Verify Spark installation and version"
+      "content": "## Check for any errors in the Spark logs"
     },
     {
       "name": "cell_3",
       "type": "OP_LANG",
       "enabled": true,
-      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `spark-submit --version`"
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -i \"error\" ${PATH_TO_SPARK_LOGS}`"
     },
     {
       "name": "cell_4",
       "type": "MARKDOWN",
       "enabled": true,
-      "content": "## Check Spark job configuration to ensure serializer is set correctly"
+      "content": "## Check for any serialization errors in the Spark logs"
     },
     {
       "name": "cell_5",
       "type": "OP_LANG",
       "enabled": true,
-      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -i \"spark.serializer\" ${PATH_TO_SPARK_JOB_CONFIGURATION}`"
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -i \"serialization\" ${PATH_TO_SPARK_LOGS}`"
     },
     {
       "name": "cell_6",
       "type": "MARKDOWN",
       "enabled": true,
-      "content": "## Inspect the data causing the serialization error"
+      "content": "## Check if the serialization error is related to a specific data type"
     },
     {
       "name": "cell_7",
       "type": "OP_LANG",
       "enabled": true,
-      "content": "host | host_name=$HOST_NAME | invoke_serialization_error_script($DATA_THAT_CAUSED_SERIALIZATION_ERROR)"
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -i \"${DATA_TYPE}\" ${PATH_TO_SPARK_LOGS}`"
     },
     {
       "name": "cell_8",
       "type": "MARKDOWN",
       "enabled": true,
-      "content": "## Check the encoding of the data to ensure it is compatible with the serializer"
+      "content": "## Check if there are any incompatible data types being used"
     },
     {
       "name": "cell_9",
       "type": "OP_LANG",
       "enabled": true,
-      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `file -i ${PATH_TO_DATA_FILE}`"
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -i \"incompatible\" ${PATH_TO_SPARK_LOGS}`"
     },
     {
       "name": "cell_10",
       "type": "MARKDOWN",
       "enabled": true,
-      "content": "## Check for any error messages in Spark logs related to data serialization errors"
+      "content": "## Check if there are any missing dependencies"
     },
     {
       "name": "cell_11",
       "type": "OP_LANG",
       "enabled": true,
-      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -i \"serialization error\" ${PATH_TO_SPARK_LOGS}`"
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -i \"dependency\" ${PATH_TO_SPARK_LOGS}`"
     },
     {
       "name": "cell_12",
       "type": "MARKDOWN",
       "enabled": true,
-      "content": "## Incompatibility between the Spark version and the data serialization library used."
+      "content": "## Check if there are any classpath issues"
     },
     {
       "name": "cell_13",
       "type": "OP_LANG",
       "enabled": true,
-      "content": "host | host_name=$HOST_NAME | invoke_check_spark_serialization($VERSION, $LIBRARY, $PATH_TO_SPARK_LOGS)"
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -i \"classpath\" ${PATH_TO_SPARK_LOGS}`"
     },
     {
       "name": "cell_14",
       "type": "MARKDOWN",
       "enabled": true,
-      "content": "## Upgrade spark version to the latest stable release."
+      "content": "## Check if the serialization issue can be resolved by changing the serialization format"
     },
     {
       "name": "cell_15",
       "type": "OP_LANG",
       "enabled": true,
-      "content": "host | host_name=$HOST_NAME | invoke_spark_upgrade($VERSION)"
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -r -i \"${SERIALIZATION_FORMAT}\" ${PATH_TO_SPARK_CODE}`"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if upgrading Spark or dependencies can resolve the issue"
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -i \"upgrade\" ${PATH_TO_SPARK_LOGS}`"
+    },
+    {
+      "name": "cell_18",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## The data being processed contains null values or missing data, causing serialization errors."
+    },
+    {
+      "name": "cell_19",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_data_processing_script($SPARK_CONF_FILE_PATH, $DATA_FILE_PATH)"
+    },
+    {
+      "name": "cell_20",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the data source for any encoding issues and ensure that the data is properly formatted."
+    },
+    {
+      "name": "cell_21",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_data_encoding_conversion($DATA_FILE_PATH)"
     }
   ]
 }
